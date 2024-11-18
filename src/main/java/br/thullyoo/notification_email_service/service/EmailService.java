@@ -11,6 +11,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -79,4 +82,18 @@ public class EmailService {
             throw new RuntimeException("Erro ao enviar e-mail");
         }
     }
+
+    public void checkEmailAndSend(){
+        List<Email> listEmail = emailRepository.findByStatusInAndDateTimeBefore(
+                List.of(Status.Values.PENDING.toStatus(), Status.Values.ERROR.toStatus()),
+                LocalDateTime.now()
+        );
+
+        if (listEmail.isEmpty()){
+            return;
+        }
+
+        listEmail.forEach(this::sendEmail);
+    }
+
 }
