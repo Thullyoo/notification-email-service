@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class EmailService {
 
@@ -39,6 +41,18 @@ public class EmailService {
         emailRepository.save(email);
 
         return email;
+    }
+
+    public Email checkEmailStatus(UUID id){
+
+        var email = emailRepository.findById(id);
+
+        if (email.isEmpty()){
+            throw new RuntimeException("Email não registrado");
+        }
+
+        return email.get();
+
     }
 
 }
