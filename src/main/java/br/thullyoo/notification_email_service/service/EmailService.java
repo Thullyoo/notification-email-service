@@ -7,6 +7,7 @@ import br.thullyoo.notification_email_service.repository.EmailRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -55,4 +56,27 @@ public class EmailService {
 
     }
 
+    public Email sendEmail(Email email){
+        try{
+
+            SimpleMailMessage message = new SimpleMailMessage();
+
+            message.setFrom(email.getFrom());
+            message.setTo(email.getTo());
+            message.setSubject(email.getSubject());
+            message.setText(email.getMessage());
+
+            javaMailSender.send(message);
+
+            email.setStatus(Status.Values.SUCCESS.toStatus());
+
+            emailRepository.save(email);
+
+            return email;
+
+        } catch (RuntimeException e) {
+            email.setStatus(Status.Values.ERROR.toStatus());
+            throw new RuntimeException("Erro ao enviar e-mail");
+        }
+    }
 }
